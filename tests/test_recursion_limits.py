@@ -12,7 +12,8 @@ from mergrave import recursion_with_limits
 skip_hypothesis = pytest.mark.skip(reason="hypothesis is required for property tests")
 
 if importlib.util.find_spec("hypothesis") is not None:
-    from hypothesis import assume, given, strategies as st
+    from hypothesis import assume, given
+    from hypothesis import strategies as st
 
     @given(
         depth_limit=st.integers(min_value=0, max_value=50),
