@@ -1,7 +1,6 @@
 """Mergrave placeholder library."""
 
 from collections.abc import Callable
-from typing import Tuple
 
 
 def echo(value: str) -> str:
@@ -19,8 +18,8 @@ def recursion_with_limits(
     budget_limit: int,
     work: Callable[[int], bool],
     fallback: str = "limit reached",
-) -> Tuple[str, int]:
-    """Recursively execute ``work`` while respecting ``depth_limit`` and ``budget_limit``.
+) -> tuple[str, int]:
+    """Recursively execute ``work`` while respecting the provided limits.
 
     The ``work`` callable receives the number of completed steps and should
     return ``True`` when another recursive step is required. Whenever either
@@ -33,8 +32,9 @@ def recursion_with_limits(
     if depth_limit < 0 or budget_limit < 0:
         msg = "depth_limit and budget_limit must be non-negative"
         raise ValueError(msg)
-
-    def _recurse(depth_remaining: int, budget_remaining: int, steps: int) -> Tuple[str, int]:
+    def _recurse(
+        depth_remaining: int, budget_remaining: int, steps: int
+    ) -> tuple[str, int]:
         if depth_remaining <= 0 or budget_remaining <= 0:
             return fallback, steps
 
