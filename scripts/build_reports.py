@@ -5,8 +5,8 @@ from __future__ import annotations
 import html
 import shutil
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS_DIR = ROOT / "reports"
@@ -41,9 +41,21 @@ def _render_page(
     <meta charset=\"utf-8\">
     <title>{html.escape(title)}</title>
     <style>
-      body {{ font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.5; }}
-      pre {{ background: #1e1e1e; color: #f5f5f5; padding: 1rem; overflow-x: auto; border-radius: 0.5rem; }}
-      a {{ color: #0b6bf2; }}
+      body {{
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+        line-height: 1.5;
+      }}
+      pre {{
+        background: #1e1e1e;
+        color: #f5f5f5;
+        padding: 1rem;
+        overflow-x: auto;
+        border-radius: 0.5rem;
+      }}
+      a {{
+        color: #0b6bf2;
+      }}
     </style>
   </head>
   <body>
@@ -74,7 +86,12 @@ def _write_report(command: Sequence[str], destination: Path, title: str) -> None
     destination.mkdir(parents=True, exist_ok=True)
     destination.joinpath("index.html").write_text(page, encoding="utf-8")
     if result.returncode != 0:
-        raise subprocess.CalledProcessError(result.returncode, command, output=result.stdout, stderr=result.stderr)
+        raise subprocess.CalledProcessError(
+            result.returncode,
+            command,
+            output=result.stdout,
+            stderr=result.stderr,
+        )
 
 
 def _generate_unit_report() -> None:
@@ -109,7 +126,12 @@ def _generate_coverage_report() -> None:
 
     run_result = _run_command(("python", "-m", "coverage", "run", "-m", "pytest"))
     if run_result.returncode != 0:
-        raise subprocess.CalledProcessError(run_result.returncode, run_result.args, output=run_result.stdout, stderr=run_result.stderr)
+        raise subprocess.CalledProcessError(
+            run_result.returncode,
+            run_result.args,
+            output=run_result.stdout,
+            stderr=run_result.stderr,
+        )
 
     report_result = _run_command(("python", "-m", "coverage", "report", "-m"))
     if report_result.returncode != 0:
