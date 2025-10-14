@@ -1,6 +1,10 @@
 """Mergrave placeholder library."""
 
-from collections.abc import Callable
+from collections.abc import Callable, MutableMapping
+from typing import TypeVar
+
+
+_ResultT = TypeVar("_ResultT")
 
 
 def echo(value: str) -> str:
@@ -51,4 +55,25 @@ def recursion_with_limits(
         return _recurse(depth_remaining - 1, budget_remaining - 1, steps + 1)
 
     return _recurse(depth_limit, budget_limit, 0)
+
+
+def cached_execution(
+    cache_key: str,
+    cache: MutableMapping[str, _ResultT],
+    executor: Callable[[], _ResultT],
+) -> _ResultT:
+    """Return a cached result when available without running the executor.
+
+    The helper inspects ``cache`` for ``cache_key``. When a hit is found the
+    cached value is returned immediately and the ``executor`` is never invoked.
+    Otherwise ``executor`` runs and its result is stored under ``cache_key`` for
+    future lookups before being returned.
+    """
+
+    try:
+        return cache[cache_key]
+    except KeyError:
+        result = executor()
+        cache[cache_key] = result
+        return result
 
