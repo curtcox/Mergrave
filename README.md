@@ -1,12 +1,12 @@
 # Mergrave
 
-[![CI](https://github.com/Mergrave/Mergrave/actions/workflows/ci.yml/badge.svg)](https://github.com/Mergrave/Mergrave/actions/workflows/ci.yml)
+[![CI](https://github.com/curtcox/Mergrave/actions/workflows/ci.yml/badge.svg)](https://github.com/curtcox/Mergrave/actions/workflows/ci.yml)
 
 AI function calling
 
 The latest coverage and build artifacts are published to GitHub Pages after every
 successful run of the CI workflow. You can explore the generated reports at
-[https://mergrave.github.io/Mergrave/](https://mergrave.github.io/Mergrave/).
+[https://curtcox.github.io/Mergrave/](https://curtcox.github.io/Mergrave/).
 
 Every AI call is potentially 0 to many AI calls. 
 
