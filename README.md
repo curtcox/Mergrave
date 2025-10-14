@@ -24,6 +24,14 @@ Or many calls could be needed.
 - to fact/quality check the response
 - to decompose into parts
 - to research existing solutions
+- to find new tools
+- to request new tools
+- to seek clarification of the immediate task
+- to seek clarification of the ultimate goal
+- to formulate a hypothesis
+- to confirm or deny a hypothesis
+- to make notes
+- to read notes
 - to make new tools
 - to identify appropriate tools
 - to use appropriate tools
@@ -32,5 +40,6 @@ Or many calls could be needed.
   - this is making progress
   - this still make sense to do
   - anything important has changed
+  - stepping back even more is warranted
 - to pick the best response after doing some of the above multiple times
 - to guard against "forbidden" knowledge coming back
