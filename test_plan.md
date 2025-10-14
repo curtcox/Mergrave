@@ -2,7 +2,6 @@
 
 ## Unit
 
-- Returns a cached result without invoking any tools or recursion when an exact cache hit exists.
 - Skips all AI/tool work when a prior “no AI needed” decision is recorded for the same normalized input.
 - When a tool response contains executable code with a “run” directive, executes it and returns the program output.
 - Strips or masks inputs tagged as IP before any model or tool invocation.
@@ -49,14 +48,39 @@
 - Token/cost budgeting: context never exceeds token limits and cumulative cost respects budget, pruning low-value branches near limits.
 - Cache key determinism: semantically equivalent requests yield identical cache keys despite parameter ordering or superficial differences.
 
+## Integration
+
+- End-to-end cache hit: with the request pre-seeded in cache, the function returns the cached answer without invoking any tools or recursion and emits a minimal trace showing only a cache read.
+- “No AI needed” short-circuit: with a prior decision artifact stored for the normalized input, the function skips tool calls and recursion and returns the previously approved final output.
+- Code-gen→exec path: a tool returns runnable code with a “run” directive, the function executes it in the sandbox, captures stdout/stderr, and returns the program output in the requested schema.
+- Multi-tool pipeline: the function performs input transformation, generation, formatting, and post-processing across at least three tools in the correct order and returns the composed result.
+- IP guard on ingress: inputs tagged as restricted IP are masked before any tool/model call at every recursion depth, and the trace proves no raw IP leaves the guard.
+- Forbidden knowledge on egress: a tool emits disallowed content, the function redacts/blocks it, triggers a safe-rewrite pass, and returns a compliant substitute.
+- Fact-check loop: extracted claims are sent to a fact-checker, failing claims cause a recursive revision, and the final answer cites only verified claims with downgraded confidence noted where applicable.
+- Quality-gate improvement: an initial draft scores below threshold, the function triggers one improvement recursion and returns the improved version once the score exceeds the threshold.
+- Decompose→solve→merge: the function splits the request into subproblems, solves them (some in parallel branches), and merges results into a coherent final answer that covers all subgoals.
+- Token-budget orchestration: given a tight context limit, the function prunes low-value context, compresses history, and completes the run without exceeding the budget.
+- Tool selection under cost: with multiple viable tools, the function selects the cheapest toolchain that still meets quality constraints per configured objective, as evidenced by the trace.
+- Transient failure with retry: a tool fails with a retryable error once, the function applies exponential backoff and succeeds on the next attempt, logging both attempts.
+- Non-retryable failure surface: a tool returns a hard error, the function does not retry, produces a structured failure payload, and includes actionable remediation in the output.
+- New-tool bootstrap: given a tool-spec artifact, the function registers the tool during the run and successfully invokes it in a subsequent recursive step to complete the task.
+- Best-of-N candidate selection: the function generates multiple candidates via different tool plans, scores them with a judge, and returns the highest-scoring candidate with ranking metadata.
+- Code-exec repair loop: generated code fails at runtime, the function captures logs, performs an error-aware fix-and-rerun recursion, and returns the successful run’s output.
+- Depth and budget limits: with adversarial inputs that encourage infinite improvement, the function terminates at depth_limit or budget_limit and returns the best partial answer plus a summary of remaining gaps.
+- Subgraph caching: during a composite task, repeated identical subrequests are served from the run-local cache while other branches continue to use tools, reducing total calls as shown in the trace.
+- Output reformatting: upstream tools return heterogeneous structures, and the function emits the final answer in the exact user-requested schema (e.g., JSON with required fields and order).
+- Safety at all depths: a prohibited string inserted by a deep tool call is detected and removed before it can propagate to siblings or the final output, with a trace entry at the offending depth.
+- Research→synthesis: with a “research existing solutions” goal, the function uses the research tool, deduplicates overlapping findings, and synthesizes a unified, non-plagiarized response with attribution.
+
 # Done
 
 ## Unit
 - Base case termination: when the request can be satisfied directly, the function returns without recursion or tool use.
+- Returns a cached result without invoking any tools or recursion when an exact cache hit exists.
 
 ## Property
 - Recursion always terminates by honoring depth_limit or budget_limit and returns a graceful fallback when limits are hit.
 
-
+## Integration
 
 
