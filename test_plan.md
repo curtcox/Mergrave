@@ -11,7 +11,6 @@
 - When given a tool-spec artifact, registers the new tool and successfully invokes it in a subsequent recursive step.
 - Emits a structured trace containing decisions, tool calls, depths, scores, and errors sufficient to replay the plan offline.
 - Cache hit: identical normalized input returns the cached result with zero AI/tool calls or recursion.
-- Single AI call success: a request requiring exactly one AI call executes once and returns the expected result.
 - Error propagation: errors from AI calls, tools, or executed code are caught, wrapped with context, and propagated up the recursion stack.
 - Tool selection: given unambiguous intent and an available toolset, the correct tool is chosen deterministically.
 - Context transformation: inputs are normalized/optimized before the AI call while preserving semantics.
@@ -77,6 +76,7 @@
 ## Unit
 - Base case termination: when the request can be satisfied directly, the function returns without recursion or tool use.
 - Returns a cached result without invoking any tools or recursion when an exact cache hit exists.
+- Single AI call success: a request requiring exactly one AI call executes once and returns the expected result.
 
 ## Property
 - Recursion always terminates by honoring depth_limit or budget_limit and returns a graceful fallback when limits are hit.
