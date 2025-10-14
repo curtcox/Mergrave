@@ -34,16 +34,13 @@ jobs:
       - name: Run Ruff
         run: ruff check .
 
-      - name: Run tests with coverage
-        run: |
-          coverage run -m pytest
-          coverage report -m
-          coverage html
+      - name: Build HTML test reports
+        run: python scripts/build_reports.py
 
-      - name: Upload coverage HTML artifact
+      - name: Upload test reports artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: htmlcov
+          path: reports
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

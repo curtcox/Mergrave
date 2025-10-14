@@ -15,6 +15,7 @@ if importlib.util.find_spec("hypothesis") is not None:
     from hypothesis import assume, given
     from hypothesis import strategies as st
 
+    @pytest.mark.property
     @given(
         depth_limit=st.integers(min_value=0, max_value=50),
         budget_limit=st.integers(min_value=0, max_value=50),
@@ -42,6 +43,7 @@ if importlib.util.find_spec("hypothesis") is not None:
         assert steps <= depth_limit
         assert steps <= budget_limit
 
+    @pytest.mark.property
     @given(
         depth_limit=st.integers(min_value=1, max_value=50),
         budget_limit=st.integers(min_value=1, max_value=50),
@@ -70,10 +72,12 @@ if importlib.util.find_spec("hypothesis") is not None:
         assert steps < budget_limit
 else:
 
+    @pytest.mark.property
     @skip_hypothesis
     def test_property_recursion_honors_limits() -> None:
         """Placeholder when hypothesis is unavailable."""
 
+    @pytest.mark.property
     @skip_hypothesis
     def test_property_recursion_returns_completion_when_work_finishes() -> None:
         """Placeholder when hypothesis is unavailable."""

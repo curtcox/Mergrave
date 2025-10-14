@@ -2,5 +2,6 @@ __pycache__/
 *.pyc
 .coverage
 htmlcov/
+reports/
 .ruff_cache/
 .pytest_cache/
