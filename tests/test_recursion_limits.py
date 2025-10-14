@@ -133,6 +133,29 @@ def test_recursion_returns_completion_when_work_finishes(
     assert steps <= budget_limit
 
 
+def test_recursion_returns_direct_result_without_recursing() -> None:
+    """A direct answer short-circuits recursion and avoids tool usage."""
+
+    calls = 0
+
+    def work(step: int) -> bool:  # pragma: no cover - should not run
+        nonlocal calls
+        calls += 1
+        return True
+
+    result, steps = recursion_with_limits(
+        depth_limit=5,
+        budget_limit=5,
+        work=work,
+        fallback="unused",
+        direct_result="cached",
+    )
+
+    assert result == "cached"
+    assert steps == 0
+    assert calls == 0
+
+
 @pytest.mark.parametrize(
     "depth_limit, budget_limit",
     [(-1, 0), (0, -1), (-5, -5)],
