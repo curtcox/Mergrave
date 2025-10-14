@@ -1,5 +1,8 @@
 # To Do
 
+## Examples
+- Given access to the proper tools and specs, the function should be able to write something equivalent to iteself.
+
 ## Unit
 
 - Skips all AI/tool work when a prior “no AI needed” decision is recorded for the same normalized input.
