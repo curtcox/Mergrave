@@ -3,7 +3,6 @@
 from collections.abc import Callable, MutableMapping
 from typing import TypeVar
 
-
 _ResultT = TypeVar("_ResultT")
 
 
