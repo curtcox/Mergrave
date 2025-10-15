@@ -7,7 +7,7 @@ from itertools import product
 
 import pytest
 
-from mergrave import recursion_with_limits
+from mergrave import RecursiveExecutionError, recursion_with_limits
 
 skip_hypothesis = pytest.mark.skip(reason="hypothesis is required for property tests")
 
@@ -169,3 +169,33 @@ def test_recursion_rejects_negative_limits(depth_limit: int, budget_limit: int) 
 
     with pytest.raises(ValueError):
         recursion_with_limits(depth_limit, budget_limit, lambda _: False)
+
+
+def test_recursion_wraps_errors_with_context() -> None:
+    """Errors are wrapped with recursion context as they propagate."""
+
+    def work(step: int) -> bool:
+        if step == 1:
+            raise RuntimeError("tool failure")
+        return True
+
+    with pytest.raises(RecursiveExecutionError) as excinfo:
+        recursion_with_limits(depth_limit=3, budget_limit=3, work=work)
+
+    outer_error = excinfo.value
+    assert outer_error.step == 0
+    assert outer_error.depth_remaining == 3
+    assert outer_error.budget_remaining == 3
+    assert outer_error.original_exception is outer_error.__cause__
+    assert "step 0" in str(outer_error)
+    assert "depth_remaining=3" in str(outer_error)
+    assert "budget_remaining=3" in str(outer_error)
+
+    inner_error = outer_error.__cause__
+    assert isinstance(inner_error, RecursiveExecutionError)
+    assert inner_error.step == 1
+    assert inner_error.depth_remaining == 2
+    assert inner_error.budget_remaining == 2
+    assert inner_error.original_exception is inner_error.__cause__
+    assert isinstance(inner_error.__cause__, RuntimeError)
+    assert str(inner_error.__cause__) == "tool failure"

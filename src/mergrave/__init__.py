@@ -5,6 +5,42 @@ from typing import TypeVar
 
 _ResultT = TypeVar("_ResultT")
 
+__all__ = [
+    "echo",
+    "recursion_with_limits",
+    "cached_execution",
+    "RecursiveExecutionError",
+]
+
+
+class RecursiveExecutionError(RuntimeError):
+    """Exception raised when recursive work fails.
+
+    The error captures recursion state so callers can understand which step,
+    depth, and budget were active when the underlying failure occurred. The
+    original exception is available via ``__cause__`` and the
+    ``original_exception`` attribute for convenience.
+    """
+
+    def __init__(
+        self,
+        *,
+        step: int,
+        depth_remaining: int,
+        budget_remaining: int,
+        cause: Exception,
+    ) -> None:
+        message = (
+            "Error during recursion step "
+            f"{step} (depth_remaining={depth_remaining}, "
+            f"budget_remaining={budget_remaining})"
+        )
+        super().__init__(message)
+        self.step = step
+        self.depth_remaining = depth_remaining
+        self.budget_remaining = budget_remaining
+        self.original_exception = cause
+
 
 def echo(value: str) -> str:
     """Return the input value unchanged.
@@ -48,10 +84,28 @@ def recursion_with_limits(
         if depth_remaining <= 0 or budget_remaining <= 0:
             return fallback, steps
 
-        if not work(steps):
+        try:
+            should_continue = work(steps)
+        except Exception as exc:
+            raise RecursiveExecutionError(
+                step=steps,
+                depth_remaining=depth_remaining,
+                budget_remaining=budget_remaining,
+                cause=exc,
+            ) from exc
+
+        if not should_continue:
             return "completed", steps
 
-        return _recurse(depth_remaining - 1, budget_remaining - 1, steps + 1)
+        try:
+            return _recurse(depth_remaining - 1, budget_remaining - 1, steps + 1)
+        except Exception as exc:
+            raise RecursiveExecutionError(
+                step=steps,
+                depth_remaining=depth_remaining,
+                budget_remaining=budget_remaining,
+                cause=exc,
+            ) from exc
 
     return _recurse(depth_limit, budget_limit, 0)
 
